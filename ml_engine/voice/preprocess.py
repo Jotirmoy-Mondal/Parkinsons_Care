@@ -170,6 +170,7 @@ def compute_mel_spectrogram(waveform: torch.Tensor) -> torch.Tensor:
     """MelSpectrogram: Builds  a      
     constants (16kHz, 25ms windows, 10ms hops, 80 mel bands) to extract 
     human-like frequency features.
+    """
     mel_spec = mel_transform(waveform) #it transforms the data from a simple 2D line (Volume over Time) into a 3D mathematical heatmap (Frequencies and Volume over Time)."""
 
     # Log scale — raw mel energies span a huge range, log compresses it
