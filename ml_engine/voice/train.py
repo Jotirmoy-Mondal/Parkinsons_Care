@@ -170,8 +170,8 @@ def train(pairs: list, epochs: int = 20, batch_size: int = 8, lr: float = 1e-4):
 if __name__ == "__main__":
     # Replace with your actual dataset pairs
     pairs = [
-        ("data/healthy_1.wav", "data/healthy_2.wav", 1),
-        ("data/healthy_1.wav", "data/pd_1.wav", 0),
+        ("ml_engine/data/raw/healthy_000.wav", "ml_engine/data/raw/healthy_001.wav", 1),
+        ("ml_engine/data/raw/healthy_001.wav", "ml_engine/data/raw/parkinsons_000.wav", 0),
         # ... build this list from your dataset
     ]
     train(pairs)
