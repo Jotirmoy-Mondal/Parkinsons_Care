@@ -18,6 +18,9 @@ def train_baseline(csv_path: str, model_output_path: str):
     # ================================
     df = pd.read_csv(csv_path)
 
+    # quick check — how many unique patients are actually behind these 1134 samples?
+    print(df["filename"].str.extract(r'(healthy_\d+|parkinsons_\d+)')[0].nunique())
+
     # Drop non-feature columns — filename is an identifier, not a predictor
     feature_cols = [c for c in df.columns if c not in ("filename", "status")] # here first c is a temp var, use to append value of c to list
 
@@ -97,6 +100,8 @@ def train_baseline(csv_path: str, model_output_path: str):
     # ==========================================
     joblib.dump(model, model_output_path)
     print(f"\nModel saved to {model_output_path}")
+
+    
 
     return model
 
