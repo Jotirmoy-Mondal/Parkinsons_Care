@@ -43,3 +43,21 @@ class VoiceTestResult(models.Model):
 
     def __str__(self):
         return f"{self.patient} - {self.task_type} - {self.stability_score:.1f}% ({self.created_at.date()})"
+
+
+
+class PatientVoiceBaseline(models.Model):
+    """
+    Stores each patient's enrollment baseline embedding — the fixed
+    reference point their long-term progress is measured against.
+    One per patient (created once, on their first-ever voice test).
+    """
+    patient = models.OneToOneField(
+        Patient, on_delete=models.CASCADE, related_name="voice_baseline"
+    )
+    embedding = models.JSONField()
+    model_version = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Baseline for {self.patient} ({self.created_at.date()})"
