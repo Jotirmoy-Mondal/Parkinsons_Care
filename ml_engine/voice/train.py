@@ -13,7 +13,7 @@ from torch.utils.data import Dataset, DataLoader
 
 from ml_engine.voice.model import SiameseVoiceNet
 from ml_engine.voice.preprocess import preprocess_audio
-from ml_engine.voice.build_pairs import build_train_val_pairs
+from ml_engine.voice.buildPairs import build_train_val_pairs
 # -------------------------------------------------------------------------
 # EXPLANATION FOR IMPORTS:
 # Brings in PyTorch's core neural network tools (`torch.nn`), data loading 
@@ -167,12 +167,12 @@ def train(train_pairs: list, val_pairs: list, epochs: int = 20, batch_size: int 
 
 if __name__ == "__main__":
     train_pairs, val_pairs = build_train_val_pairs(
-        healthy_dir="ml_engine/data/raw/Healthy_voice",
+        healthy_dir="ml_engine/data/raw/healthy_voice",
         pd_dir="ml_engine/data/raw/parkinsons_voice",
         train_pairs_count=800,
         val_pairs_count=200,
     )
-    train(train_pairs, val_pairs, epochs=20, batch_size=8)
+    train(train_pairs, val_pairs, epochs=50, batch_size=8)
 # -------------------------------------------------------------------------
 # EXPLANATION FOR if __name__ == "__main__":
 # Takes/Returns: Nothing.
