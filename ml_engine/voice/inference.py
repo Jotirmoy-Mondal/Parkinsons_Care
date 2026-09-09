@@ -86,7 +86,13 @@ EMBEDDING_DIM = 128
 # Calibrate this against your training data's distance distribution —
 # see calibrate_decay_rate() below. This is a placeholder until you do.
 #The Decay Rate is the "Teacher" that you hire to grade the AI's raw distance and turn it into a 0-100% Stability Score.
-DECAY_RATE = 2.0
+
+# Calibrated 2026-09-09  using calibrate.py, 50 healthy/PD sample pairs.
+# healthy median distance = 0.6138 -> 90%, PD median distance = 1.0160 -> 35%
+CALIBRATION_D_HEALTHY = 0.6138
+CALIBRATION_D_PD = 1.0160
+CALIBRATION_TARGET_HEALTHY = 90.0
+CALIBRATION_TARGET_PD = 35.0
 
 #"_"This is Private. For internal use only
 _model = None  # module-level singleton, loaded once
@@ -137,18 +143,24 @@ def euclidean_distance(emb1: torch.Tensor, emb2: torch.Tensor) -> float:
     # It subtracts the coordinates (emb1 - emb2), applies the distance formula (p=2),
     # and uses .item() to rip the raw Python float out of the PyTorch tensor wrapper.
     distance = torch.norm(emb1 - emb2, p=2).item()
+    return distance
 
-
-def distance_to_stability(distance: float, decay_rate: float = DECAY_RATE) -> float:
+#decay_rate
+def distance_to_stability(distance: float) -> float:
     """
     Converts a raw distance into a 0-100 stability score.
     distance=0 (identical) -> 100%. Larger distance -> decays toward 0.
-    NOTE: decay_rate must be calibrated against real distance distributions
-    (see calibrate_decay_rate) — an uncalibrated rate gives a meaningless number.
+    
+    Two-point calibrated curve: maps CALIBRATION_D_HEALTHY -> 90%,
+    CALIBRATION_D_PD -> 35%, with smooth exponential decay elsewhere.
+    See calibrate.py for how these constants were derived.
     """
-    stability = 100 * math.exp(-decay_rate * distance)
-    return round(stability, 1)
-
+    
+    ratio = CALIBRATION_TARGET_PD / CALIBRATION_TARGET_HEALTHY
+    exponent = (distance - CALIBRATION_D_HEALTHY) / (CALIBRATION_D_PD - CALIBRATION_D_HEALTHY)
+    score = CALIBRATION_TARGET_HEALTHY * (ratio ** exponent)
+    score = max(0.0, min(100.0, score))
+    return round(score, 1)
 
 def run_voice_inference(
     audio_path: str,
