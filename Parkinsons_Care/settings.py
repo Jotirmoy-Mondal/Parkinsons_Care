@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     # ... default apps
     'rest_framework',
     'corsheaders',
-    'writing_test'
+    'writing_test',
     'voice_test',
 ]
 
