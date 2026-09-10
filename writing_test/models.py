@@ -3,7 +3,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="patient_profile")
     date_of_birth = models.DateField(blank=True, null=True)
@@ -13,15 +12,8 @@ class Patient(models.Model):
     def __str__(self):
         return self.user.get_full_name() or self.user.username
 
-
 class DailyWritingTest(models.Model):
-    patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="writing_tests")  # OLD — keep for now
-
-    # TEMPORARY — bridges old data to the new structure, removed in Phase 3
-    patient_new = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name="writing_tests_new",
-        null=True, blank=True,
-    )
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="writing_tests")
 
     TEST_TYPE_CHOICES = [
         ('spiral', 'Archimedean Spiral'),
@@ -36,4 +28,4 @@ class DailyWritingTest(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.patient.username} - {self.test_type} - {self.created_at.strftime('%Y-%m-%d')}"
+        return f"{self.patient} - {self.test_type} - {self.created_at.strftime('%Y-%m-%d')}"
