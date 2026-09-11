@@ -44,14 +44,15 @@ def train_baseline(csv_path: str, model_output_path: str):
     # it return a new df
     subject_pattern = r'(healthy_\d+|parkinsons_\d+)'
     
+    
     # 2. Extract the data into a brand new, clean column. 
     # This allows you to inspect df.head() later if something goes wrong!
     df["subject_id"] = df["filename"].str.extract(subject_pattern)[0]
-        unique_subjects_count = df["subject_id"].nunique()
-        print(f"Total unique subjects found: {unique_subjects_count}")
+    unique_subjects_count = df["subject_id"].nunique()
+    print(f"Total unique subjects found: {unique_subjects_count}")
 
     # Drop non-feature columns — filename is an identifier, not a predictor
-    feature_cols = df.columns.drop(["filename", "status"]).tolist()    
+    feature_cols = df.columns.drop(["filename", "status", "subject_id"]).tolist()
     # status 0 means healthy
     # ignoring filename and status then converting to list
 
@@ -126,6 +127,7 @@ def train_baseline(csv_path: str, model_output_path: str):
     # SECTION 5: EVALUATE MODEL
     # ==========================================
     y_pred = model.predict(X_test)
+    print(y_pred)
     
     # Calculates the exact probability (0.0 to 1.0) of a positive Parkinson's diagnosis.
     # It takes the testing features (X_test) and slices [:, 1] to discard the healthy 
