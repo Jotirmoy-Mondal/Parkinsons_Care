@@ -9,7 +9,11 @@ import random
 
 
 def list_wav_files(directory: str) -> list:
-    return [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(".wav")]
+    wav_files=[]
+    for f in os.listdir(directory):
+        if f.endswith(".wav"):
+            wav_files.append(os.path.join(directory, f))
+            return wav_files
 # -------------------------------------------------------------------------
 # EXPLANATION FOR list_wav_files:
 # Takes: `directory` (string) — the name of the folder you want to search.
@@ -25,7 +29,7 @@ def split_files(files: list, val_ratio: float = 0.2, seed: int = 42) -> tuple:
     same file appearing in both train and validation pairs."""
     random.Random(seed).shuffle(files)
     split_idx = int(len(files) * (1 - val_ratio))
-    return files[:split_idx], files[split_idx:]
+    return files[:split_idx], files[split_idx:] # means up to this or from this
 # -------------------------------------------------------------------------
 # EXPLANATION FOR split_files:
 # Takes: 
@@ -41,9 +45,9 @@ def split_files(files: list, val_ratio: float = 0.2, seed: int = 42) -> tuple:
 
 def generate_pairs(healthy_files: list, pd_files: list, num_pairs: int) -> list:
     pairs = []
-    for _ in range(num_pairs // 2):
-        a, b = random.sample(healthy_files, 2)
-        pairs.append((a, b, 1))  # similar: both healthy
+    for _ in range(num_pairs // 2): #7 / 2 yields 3.5, but 7 // 2 yields 3
+        a, b = random.sample(healthy_files, 2) #.sample() ensures it picks two different files without accidentally picking the exact same file twice.
+        pairs.append((a, b, 1))  # similar: both healthy and 1 is label of each file
 
         h = random.choice(healthy_files)
         p = random.choice(pd_files)
@@ -68,22 +72,22 @@ def generate_pairs(healthy_files: list, pd_files: list, num_pairs: int) -> list:
 
 def build_train_val_pairs(
     healthy_dir: str, pd_dir: str,
-    train_pairs_count: int = 800, val_pairs_count: int = 200,
-    val_ratio: float = 0.2,
+    train_pairs_count: int = 800, test_pairs_count: int = 200,
+    test_ratio: float = 0.2,
 ) -> tuple:
     healthy_files = list_wav_files(healthy_dir)
     pd_files = list_wav_files(pd_dir)
 
-    healthy_train, healthy_val = split_files(healthy_files, val_ratio)
-    pd_train, pd_val = split_files(pd_files, val_ratio)
+    healthy_train, healthy_test = split_files(healthy_files, test_ratio) #A new list containing the bulk of the files (typically 80%), and A new list containing the remaining files (typically 20%)
+    pd_train, pd_test = split_files(pd_files, test_ratio) 
 
-    print(f"Healthy: {len(healthy_train)} train files, {len(healthy_val)} val files")
-    print(f"PD: {len(pd_train)} train files, {len(pd_val)} val files")
+    print(f"Healthy: {len(healthy_train)} train files, {len(healthy_test)} test files")
+    print(f"PD: {len(pd_train)} train files, {len(pd_test)} test files")
 
     train_pairs = generate_pairs(healthy_train, pd_train, train_pairs_count)
-    val_pairs = generate_pairs(healthy_val, pd_val, val_pairs_count)
+    test_pairs = generate_pairs(healthy_test, pd_test, test_pairs_count)
 
-    return train_pairs, val_pairs
+    return train_pairs, test_pairs
 # -------------------------------------------------------------------------
 # EXPLANATION FOR build_train_val_pairs:
 # Takes: 
@@ -101,11 +105,11 @@ def build_train_val_pairs(
 
 
 if __name__ == "__main__":
-    train_pairs, val_pairs = build_train_val_pairs(
+    train_pairs, test_pairs = build_train_val_pairs(
         healthy_dir="ml_engine/data/raw/healthy_voice",
         pd_dir="ml_engine/data/raw/parkinsons_voice",
     )
-    print(f"Train pairs: {len(train_pairs)}, Val pairs: {len(val_pairs)}")
+    print(f"Train pairs: {len(train_pairs)}, Test pairs: {len(test_pairs)}")
 # -------------------------------------------------------------------------
 # EXPLANATION FOR if __name__ == "__main__":
 # Takes/Returns: Nothing directly.
