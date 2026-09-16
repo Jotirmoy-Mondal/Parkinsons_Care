@@ -83,8 +83,6 @@ MODEL_VERSION = "voice_cnn_v1"
 WEIGHTS_PATH = "ml_engine/voice/weights/voice_model.pth"
 EMBEDDING_DIM = 128
 
-# Calibrate this against your training data's distance distribution —
-# see calibrate_decay_rate() below. This is a placeholder until you do.
 #The Decay Rate is the "Teacher" that you hire to grade the AI's raw distance and turn it into a 0-100% Stability Score.
 
 # Calibrated 2026-09-09  using calibrate.py, 50 healthy/PD sample pairs.
