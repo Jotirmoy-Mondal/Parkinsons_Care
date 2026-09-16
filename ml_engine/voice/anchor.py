@@ -56,6 +56,7 @@ def get_recent_mean_embedding(patient, days: int = 30) -> torch.Tensor:
     N days, for short-term trend comparison. Returns None if there
     isn't enough recent history yet.
     """
+    past_data_embd=[]
     cutoff = timezone.now() - timedelta(days=days)
     recent_results = VoiceTestResult.objects.filter(
         patient=patient, created_at__gte=cutoff
@@ -63,9 +64,12 @@ def get_recent_mean_embedding(patient, days: int = 30) -> torch.Tensor:
 
     if not recent_results.exists():
         return None
-
-    embeddings = [torch.tensor(r.embedding) for r in recent_results]
-    stacked = torch.stack(embeddings)
+    for r in recent_results:
+    # Append modifies the list in place; do not assign it to a new variable
+        past_data_embd.append(torch.tensor(r.embedding))
+    
+# Execute the stack and mean calculations only after the loop finishes all items
+    stacked = torch.stack(past_data_embd)
     return stacked.mean(dim=0)
 # -------------------------------------------------------------------------
 # EXPLANATION FOR get_recent_mean_embedding:
