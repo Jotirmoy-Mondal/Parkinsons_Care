@@ -93,6 +93,8 @@ class HandwritingFeatureExtractor(nn.Module):
             # TAKES: in_features (the total incoming connections) and out_features (the target size for the output).
             # RETURNS: A fully connected linear layer that applies a mathematical matrix multiplication (y = xA^T + b).
             nn.Linear(128, 128),
+
+            #bottom 3 layer can lead to overfitting
             nn.ReLU(inplace=True),
             
             # nn.Dropout():
@@ -137,11 +139,16 @@ class SiameseParkinsonNetwork(nn.Module):
         self.twin_cnn = HandwritingFeatureExtractor()
 
     def forward(self, image_yesterday, image_today):
-        # Pass Image A through the network to get its 128-dimensional coordinates
-        embedding_a = self.twin_cnn(image_yesterday)
-        
-        # Pass Image B through the SAME network to get its coordinates
-        embedding_b = self.twin_cnn(image_today)
-        
-        # Return both sets of coordinates so the Loss Function (e.g., Contrastive Loss) can compare them
-        return embedding_a, embedding_b
+    batch_size = image_yesterday.size(0)
+    
+    # Stack both images into one batch along dim=0
+    combined = torch.cat([image_yesterday, image_today], dim=0)  # (2*batch, 1, 224, 224)
+    
+    # One single forward pass through the CNN instead of two
+    embeddings = self.twin_cnn(combined)  # (2*batch, 128)
+    
+    # Split back into the two halves
+    embedding_a = embeddings[:batch_size]
+    embedding_b = embeddings[batch_size:]
+    
+    return embedding_a, embedding_b
