@@ -124,7 +124,7 @@ import os
 
 # Import your database model and the PyTorch toolbelt!
 from .models import DailyWritingTest
-from ml_engine.predictor import evaluate_stability
+from ml_engine.write.predictor import evaluate_stability
 
 class ParkinsonTestAnalysisView(APIView):
     # This tells Django to expect a file upload (like a photo from a phone)
