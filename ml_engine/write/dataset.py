@@ -30,8 +30,8 @@ class ParkinsonSiameseDataset(Dataset):
             all_files = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
             
             for filename in all_files:
-                parts = filename.split('-')
-                if len(parts) < 2:
+                parts = filename.split('-') # split right and left word of "-" and return in a list
+                if len(parts) < 2:#[spiral, H1.png]
                     continue 
                     
                 patient_part = parts[-1].split('.')[0] # e.g., "H1" or "P4"
